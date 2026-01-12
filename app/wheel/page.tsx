@@ -11,22 +11,22 @@ export default async function WheelPage() {
     })
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10">
+        <div className="min-h-screen bg-slt-theme flex flex-col items-center py-10">
             <div className="w-full max-w-4xl px-4 flex justify-between items-center mb-10">
-                <h1 className="text-4xl font-extrabold text-[#0b3351]">Win Wheel</h1>
-                <Link href="/admin">
+                <h1 className="text-4xl font-extrabold text-brand-gradient drop-shadow-sm">Win Wheel</h1>
+                {/* <Link href="/admin">
                     <Button variant="outline">Admin Panel</Button>
-                </Link>
+                </Link> */}
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-xl border">
                 <RealtimeWheel initialSegments={segments} />
             </div>
 
-            <div className="mt-12 text-center text-gray-400 max-w-md text-sm">
+            {/* <div className="mt-12 text-center text-gray-400 max-w-md text-sm">
                 <p>Real-time updates powered by Supabase.</p>
                 <p>Changes in the admin panel reflect instantly.</p>
-            </div>
+            </div> */}
         </div>
     )
 }

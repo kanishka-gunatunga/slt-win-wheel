@@ -225,9 +225,9 @@ export default function RealtimeWheel({ initialSegments }: RealtimeWheelProps) {
                 )}
             </Button>
 
-            <div className="text-sm text-gray-500">
+            {/* <div className="text-sm text-gray-500">
                 Prizes Available: {activeSegments.filter(s => s.stock > 0).reduce((acc, s) => acc + s.stock, 0)}
-            </div>
+            </div> */}
 
             <WinnerModal
                 isOpen={showWinnerModal}

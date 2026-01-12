@@ -57,9 +57,9 @@ export default function WinnerModal({ isOpen, onClose, prizeName, winLogId }: Wi
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl text-center text-[#0b3351]">🎉 Congratulations! 🎉</DialogTitle>
-                    <DialogDescription className="text-center text-lg mt-2">
-                        You won: <span className="font-bold text-[#ff8f43]">{prizeName}</span>
+                    <DialogTitle className="text-3xl text-center font-extrabold text-brand-gradient">🎉 Congratulations! 🎉</DialogTitle>
+                    <DialogDescription className="text-center text-lg mt-2 font-medium">
+                        You won: <span className="font-bold text-orange-600">{prizeName}</span>
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
