@@ -25,13 +25,41 @@ app.prepare().then(() => {
     io.on("connection", (socket) => {
         console.log("Client connected:", socket.id);
 
-        socket.on("spin", async () => {
+        socket.on("join_wheel", (slug) => {
+            const room = `wheel_${slug}`;
+            socket.join(room);
+            console.log(`Socket ${socket.id} joined ${room}`);
+        });
+
+        socket.on("spin", async (data: { slug: string }) => {
             try {
-                console.log("Spin request received");
+                const { slug } = data;
+                if (!slug) {
+                    socket.emit("spin_result", { success: false, error: 'Wheel slug required' });
+                    return;
+                }
+
+                console.log(`Spin request received for wheel: ${slug}`);
+
                 // Transaction logic for spin
                 const result = await prisma.$transaction(async (tx) => {
+                    // First find the wheel to ensure it exists and is enabled
+                    const wheel = await tx.wheel.findUnique({
+                        where: { slug }
+                    });
+
+                    if (!wheel) {
+                        throw new Error('Wheel not found'); // Caught below
+                    }
+                    if (!wheel.isEnabled) {
+                        throw new Error('Wheel is currently disabled');
+                    }
+
                     const segments = await tx.segment.findMany({
-                        where: { stock: { gt: 0 } },
+                        where: {
+                            wheelId: wheel.id,
+                            stock: { gt: 0 }
+                        },
                     });
 
                     if (segments.length === 0) {
@@ -61,27 +89,27 @@ app.prepare().then(() => {
                     }
 
                     const winLog = await tx.winLog.create({
-                        data: { segmentId: winner.id },
+                        data: {
+                            segmentId: winner.id,
+                            wheelId: wheel.id
+                        },
                     });
 
-                    return { success: true, segment: winner, winLogId: winLog.id };
+                    return { success: true, segment: winner, winLogId: winLog.id, wheelId: wheel.id };
                 });
 
                 if (result.success) {
                     // Emit success to THIS client
                     socket.emit("spin_result", result);
 
-                    // Broadcast update to ALL clients (stock changed)
-                    // Fetch updated segments to broadcast exact state? Or just trust clients to refetch?
-                    // Better to emit event `segment_update` with the modified segment?
-                    // Or just tell them to refetch?
-                    // Supabase Realtime sent the CHANGED ROW. Let's send the changed segment.
-
-                    // Re-fetch the updated segment to be sure
+                    // Broadcast update to ALL clients in the wheel room
                     const updatedSegment = await prisma.segment.findUnique({ where: { id: result.segment!.id } });
                     if (updatedSegment) {
-                        io.emit("segment_update", updatedSegment);
+                        io.to(`wheel_${slug}`).emit("segment_update", updatedSegment);
                     }
+
+                    // Also emit a "winner_announced" event to admin room? Or just rely on segment update.
+                    // For now, segment update is key for UI.
                 } else {
                     socket.emit("spin_result", result);
                 }

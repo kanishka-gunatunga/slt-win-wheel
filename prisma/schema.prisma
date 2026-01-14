@@ -7,6 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Wheel {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  isEnabled Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  segments  Segment[]
+  winLogs   WinLog[]
+}
+
 model Segment {
   id          String   @id @default(uuid())
   label       String
@@ -14,13 +25,17 @@ model Segment {
   stock       Int
   probability Float
   imageUrl    String?
+  wheelId     String?
+  wheel       Wheel?   @relation(fields: [wheelId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model WinLog {
-  id        String   @id @default(uuid())
-  segmentId String
+  id            String   @id @default(uuid())
+  segmentId     String
+  wheelId       String?
+  wheel         Wheel?   @relation(fields: [wheelId], references: [id])
   wonAt         DateTime @default(now())
   winnerName    String?
   winnerPhone   String?
@@ -32,4 +47,9 @@ model Admin {
   username  String   @unique
   password  String
   createdAt DateTime @default(now())
+}
+
+model SystemSetting {
+  key   String @id
+  value String
 }

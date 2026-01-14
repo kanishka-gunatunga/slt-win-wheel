@@ -2,6 +2,11 @@
 
 import { useActionState } from 'react'
 import { login } from '@/app/actions/auth'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Lock } from 'lucide-react'
 
 const initialState = {
     success: false,
@@ -9,44 +14,72 @@ const initialState = {
 }
 
 export default function LoginPage() {
-    const [state, formAction] = useActionState(login, initialState)
+    // @ts-ignore - types for useActionState might be loose in current react definitions
+    const [state, formAction, isPending] = useActionState(login, initialState)
 
     return (
-        <div className="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
-            <div className="w-full max-w-sm p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <h1 className="text-2xl font-bold mb-6 text-center text-gray-900 dark:text-white">Admin Login</h1>
-                <form action={formAction} className="space-y-4">
-                    {state?.error && (
-                        <div className="bg-red-50 text-red-500 text-sm p-3 rounded-md border border-red-200">
-                            {state.error}
+        <div className="min-h-screen bg-[#0F172B] flex items-center justify-center p-4 font-[Arial]">
+            <div className="w-full max-w-md space-y-8 relative">
+                {/* Background glow effect */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-brand-gradient opacity-20 blur-[100px] rounded-full pointer-events-none" />
+
+                <Card className="bg-[#1E293B] border-[#334155] relative z-10 shadow-2xl">
+                    <CardHeader className="space-y-1 text-center">
+                        <div className="flex justify-center mb-4">
+                            <div className="w-12 h-12 rounded-full bg-[#334155] flex items-center justify-center">
+                                <Lock className="w-6 h-6 text-[#9810FA]" />
+                            </div>
                         </div>
-                    )}
-                    <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300" htmlFor="username">Username</label>
-                        <input
-                            name="username"
-                            id="username"
-                            required
-                            className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300" htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            required
-                            className="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
-                    >
-                        Sign In
-                    </button>
-                </form>
+                        <CardTitle className="text-2xl font-bold text-white">
+                            Admin Login
+                        </CardTitle>
+                        <CardDescription className="text-[#94A3B8]">
+                            Enter your credentials to access the dashboard
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form action={formAction} className="space-y-4">
+                            {state?.error && (
+                                <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium">
+                                    {state.error}
+                                </div>
+                            )}
+                            <div className="space-y-2">
+                                <Label htmlFor="username" className="text-gray-200">Username</Label>
+                                <Input
+                                    id="username"
+                                    name="username"
+                                    type="text"
+                                    placeholder="Enter your username"
+                                    required
+                                    className="bg-[#0F172B] border-[#334155] text-white placeholder:text-gray-500 focus-visible:ring-[#9810FA]"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="password" className="text-gray-200">Password</Label>
+                                <Input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    required
+                                    className="bg-[#0F172B] border-[#334155] text-white placeholder:text-gray-500 focus-visible:ring-[#9810FA]"
+                                />
+                            </div>
+                            <Button
+                                type="submit"
+                                className="w-full bg-[#9810FA] hover:bg-[#8000E0] text-white font-semibold transition-all duration-200 hover:shadow-[0_0_20px_-5px_#9810FA]"
+                                disabled={isPending}
+                            >
+                                {isPending ? 'Signing in...' : 'Sign In'}
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
+
+                <p className="text-center text-sm text-[#64748B]">
+                    Protected Area • Authorized Personnel Only
+                </p>
             </div>
         </div>
     )
